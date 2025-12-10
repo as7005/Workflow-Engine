@@ -1,13 +1,15 @@
+# app/engine.py
 import asyncio
 from datetime import datetime
 from app.graph_store import store
 from app.websocket_manager import ws_manager
 from app.workflows import NODE_REGISTRY
 
+QUALITY_THRESHOLD = 20  # set your threshold here
 
 class SimpleEngine:
     async def start(self, run):
-        # directly run the graph
+        # start the workflow
         await self.run_graph(run)
 
     async def run_graph(self, run):
@@ -20,6 +22,7 @@ class SimpleEngine:
 
         nodes_by_name = {n.name: n for n in graph.nodes}
         node = graph.start_node
+        visited_nodes = set()  # to avoid infinite loops in case threshold is never reached
 
         while node:
             run.current_node = node
@@ -50,8 +53,17 @@ class SimpleEngine:
             run.logs.append({"timestamp": datetime.utcnow().isoformat(), "node": node, "status": "success"})
             await ws_manager.push(run.run_id, {"event": "node_end", "node": node, "state": run.state})
 
+            # ----------------------------
+            # LOOP EXIT CONDITION
+            # ----------------------------
+            if run.state.get("quality_score", 0) >= QUALITY_THRESHOLD:
+                # Stop the loop if threshold is reached
+                break
+
             next_nodes = graph.edges.get(node, [])
-            node = next_nodes[0] if next_nodes else None
+            if not next_nodes:
+                break
+            node = next_nodes[0]  # pick first in the list for simplicity
 
         run.current_node = None
         run.finished = True
