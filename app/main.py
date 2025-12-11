@@ -3,11 +3,17 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from app.models import GraphDef, RunRequest, RunState
 from app.graph_store import store
-from app.engine import SimpleEngine
+from app.engine import WorkflowEngine
 from app.websocket_manager import ws_manager
+import asyncio
+from fastapi import WebSocketDisconnect
+from app.ws_code_review import router as ws_code_review_router
+
 
 app = FastAPI(title="Workflow Engine with WebSocket Streaming", version="0.1.0")
-engine = SimpleEngine()
+engine = WorkflowEngine()
+app.include_router(ws_code_review_router)
+
 
 
 @app.post("/graph/create", status_code=201)
@@ -70,6 +76,31 @@ async def websocket_endpoint(websocket: WebSocket, run_id: str):
                 break
     finally:
         await ws_manager.disconnect(run_id)
+
+@app.websocket("/ws/code-review")
+async def websocket_code_review(websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            code = data.get("code", "")
+            language = data.get("language", "python")
+
+            await websocket.send_text("🔍 Analyzing your code...")
+            await asyncio.sleep(0.3)
+
+            await websocket.send_text(f"📌 Language detected: {language}")
+            await asyncio.sleep(0.3)
+
+            await websocket.send_text("✔ Code received successfully")
+            await asyncio.sleep(0.3)
+
+            await websocket.send_text("✨ Review complete.")
+    except WebSocketDisconnect:
+        print("Client disconnected from /ws/code-review")
+
+
 
 
 if __name__ == "__main__":
