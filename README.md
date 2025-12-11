@@ -53,7 +53,7 @@ The primary goal is **clarity, structure, and correctness** of a minimal workflo
 ---
 
 ## 📁 Project Structure
-
+```
 workflow-engine/
 ├── app/
 │ ├── main.py # FastAPI app & endpoints
@@ -70,7 +70,7 @@ workflow-engine/
 ├── requirements.txt
 ├── README.md
 └── .github/workflows/ci.yml # CI pipeline
-
+```
 ---
 
 ## 📊 Workflow Diagram
