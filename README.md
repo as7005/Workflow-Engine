@@ -124,7 +124,7 @@ POST /graph/create
   "start_node": "extract"
 }
 ```
-# Run a Graph
+Run a Graph
 ```
 POST /graph/run
 {
@@ -135,7 +135,8 @@ POST /graph/run
   }
 }
 ```
-# Check Run State
+Check Run State
+
 GET /graph/state/{run_id}
 
 # WebSocket Streaming
