@@ -103,7 +103,7 @@ WebSocket endpoint: ws://localhost:8000/ws/{run_id}
 ```
 ---
 ## 📌 How to Use
-# Create a Graph
+Create a Graph
 ```json
 POST /graph/create
 {
