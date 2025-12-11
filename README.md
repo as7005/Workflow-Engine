@@ -80,6 +80,7 @@ workflow-engine/
         ^                                                                 |
         |                                                                 v
         --------------------------------------------------- [loop until quality_score >= threshold]
+```
 ---
 
 ## ⚡ Quick Start
